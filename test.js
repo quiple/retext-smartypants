@@ -760,4 +760,14 @@ test('Ellipses (spaced)', async function (t) {
       )
     }
   )
+
+  await t.test(
+    'should replace three final full stops with spaces',
+    async function () {
+      assert.equal(
+        processor.processSync("'한국어(테스트)'입니다.").toString(),
+        '‘한국어(테스트)’입니다.'
+      )
+    }
+  )
 })
