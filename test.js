@@ -281,7 +281,7 @@ test('Curly quotes', async function (t) {
   )
 
   await t.test(
-    'should curl quotes followed by punctuation at the end of a word',
+    'should curl quotes followed by punctuation at the end of a word #1',
     async function () {
       assert.equal(
         processor.processSync("'누구인가?'라고 말했다.").toString(),
@@ -291,7 +291,7 @@ test('Curly quotes', async function (t) {
   )
 
   await t.test(
-    'should curl quotes followed by punctuation at the end of a word',
+    'should curl quotes followed by punctuation at the end of a word #2',
     async function () {
       assert.equal(
         processor.processSync("'맛있다~'라며 감탄했다.").toString(),
