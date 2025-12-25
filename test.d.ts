@@ -1,2 +1,2 @@
-export {};
-//# sourceMappingURL=test.d.ts.map
+export {}
+// # sourceMappingURL=test.d.ts.map
