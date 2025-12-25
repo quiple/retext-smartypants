@@ -269,6 +269,36 @@ test('Curly quotes', async function (t) {
       assert.equal(processor.processSync('"~').toString(), '”~')
     }
   )
+
+  await t.test(
+    'should curl quotes followed by punctuation at the end of a word',
+    async function () {
+      assert.equal(
+        processor.processSync("'한국어(테스트)'입니다.").toString(),
+        '‘한국어(테스트)’입니다.'
+      )
+    }
+  )
+
+  await t.test(
+    'should curl quotes followed by punctuation at the end of a word',
+    async function () {
+      assert.equal(
+        processor.processSync("'누구인가?'라고 말했다.").toString(),
+        '‘누구인가?’라고 말했다.'
+      )
+    }
+  )
+
+  await t.test(
+    'should curl quotes followed by punctuation at the end of a word',
+    async function () {
+      assert.equal(
+        processor.processSync("'맛있다~'라며 감탄했다.").toString(),
+        '‘맛있다~’라며 감탄했다.'
+      )
+    }
+  )
 })
 
 test('En- and em-dashes', async function (t) {
@@ -757,16 +787,6 @@ test('Ellipses (spaced)', async function (t) {
       assert.equal(
         processor.processSync('Alfred Bertrand. . .').toString(),
         'Alfred Bertrand\u2026'
-      )
-    }
-  )
-
-  await t.test(
-    'should replace three final full stops with spaces',
-    async function () {
-      assert.equal(
-        processor.processSync("'한국어(테스트)'입니다.").toString(),
-        '‘한국어(테스트)’입니다.'
       )
     }
   )
