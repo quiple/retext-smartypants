@@ -303,7 +303,7 @@ test('Curly quotes', async function (t) {
   await t.test('', async function () {
     assert.equal(
       processor.processSync('"...? 뭐라고?"').toString(),
-      '“...? 뭐라고?”'
+      '“…? 뭐라고?”'
     )
   })
 
