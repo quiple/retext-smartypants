@@ -299,6 +299,36 @@ test('Curly quotes', async function (t) {
       )
     }
   )
+
+  await t.test(
+    '',
+    async function () {
+      assert.equal(
+        processor.processSync('"...? 뭐라고?"').toString(),
+        '“...? 뭐라고?”'
+      )
+    }
+  )
+
+  await t.test(
+    '',
+    async function () {
+      assert.equal(
+        processor.processSync('"?!"').toString(),
+        '“?!”'
+      )
+    }
+  )
+
+  await t.test(
+    '',
+    async function () {
+      assert.equal(
+        processor.processSync('"—아니—"').toString(),
+        '“—아니—”'
+      )
+    }
+  )
 })
 
 test('En- and em-dashes', async function (t) {
