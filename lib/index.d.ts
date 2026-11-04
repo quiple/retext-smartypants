@@ -69,9 +69,30 @@ export type State = {
    */
   close: Quotes
   /**
+   *   Cached searches for closing quotes.
+   */
+  elisionSearches: WeakMap<Parents, ElisionSearch>
+  /**
    *   Opening quotes.
    */
   open: Quotes
+}
+/**
+ * The first closing quote found from an index in a parent.
+ */
+export type ElisionSearch = {
+  /**
+   *   First index searched.
+   */
+  start: number
+  /**
+   *   Index of the closing quote, or the length if none was found.
+   */
+  end: number
+  /**
+   *   Number of children when searched.
+   */
+  length: number
 }
 /**
  * Quote characters.

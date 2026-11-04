@@ -200,6 +200,160 @@ test('Curly quotes', async function (t) {
   })
 
   await t.test(
+    'should curl leading elisions as apostrophes',
+    async function () {
+      for (const word of [
+        'bout',
+        'cause',
+        'cept',
+        'cos',
+        'coz',
+        'cross',
+        'cuz',
+        'em',
+        'fore',
+        'gainst',
+        'long',
+        'mid',
+        'midst',
+        'mong',
+        'mongst',
+        'neath',
+        'nother',
+        'nuff',
+        'pon',
+        'round',
+        'til',
+        'tis',
+        'twas',
+        'tween',
+        'twere',
+        'twill',
+        'twixt',
+        'twould'
+      ]) {
+        assert.equal(processor.processSync("'" + word).toString(), '’' + word)
+        assert.equal(
+          processor.processSync("'" + word + "'").toString(),
+          '‘' + word + '’'
+        )
+      }
+
+      assert.equal(
+        processor.processSync("'Twasn't easy.").toString(),
+        '’Twasn’t easy.'
+      )
+      assert.equal(
+        processor.processSync("'twouldn’t work.").toString(),
+        '’twouldn’t work.'
+      )
+      assert.equal(
+        processor.processSync("'Cause I told 'em 'bout it.").toString(),
+        '’Cause I told ’em ’bout it.'
+      )
+      assert.equal(
+        processor.processSync('"\'cause it rained"').toString(),
+        '“’cause it rained”'
+      )
+      assert.equal(
+        processor.processSync("I told 'em, 'cause it rained.").toString(),
+        'I told ’em, ’cause it rained.'
+      )
+    }
+  )
+
+  await t.test(
+    'should preserve quotes around elision words',
+    async function () {
+      assert.equal(processor.processSync("'cause'").toString(), '‘cause’')
+      assert.equal(
+        processor.processSync("'cause and effect'").toString(),
+        '‘cause and effect’'
+      )
+      assert.equal(
+        processor.processSync('"\'cause and effect\'"').toString(),
+        '“‘cause and effect’”'
+      )
+      assert.equal(processor.processSync("'causes").toString(), '‘causes')
+      assert.equal(
+        processor.processSync("'roundabout").toString(),
+        '‘roundabout'
+      )
+      assert.equal(processor.processSync("'twasn't'").toString(), '‘twasn’t’')
+      assert.equal(processor.processSync("'cause’").toString(), '‘cause’')
+    }
+  )
+
+  await t.test('should respect quote options for elisions', async function () {
+    assert.equal(
+      retext()
+        .use(retextSmartypants, {
+          closingQuotes: {double: '»', single: '›'},
+          openingQuotes: {double: '«', single: '‹'}
+        })
+        .processSync("'cause")
+        .toString(),
+      '›cause'
+    )
+    assert.equal(
+      retext()
+        .use(retextSmartypants, {quotes: false})
+        .processSync("'cause")
+        .toString(),
+      "'cause"
+    )
+  })
+
+  await t.test(
+    'should reconsider later elisions after a closing quote',
+    async function () {
+      assert.equal(
+        processor.processSync("'em hello' 'em").toString(),
+        '‘em hello’ ’em'
+      )
+    }
+  )
+
+  await t.test(
+    'should handle elisions after siblings are removed',
+    async function () {
+      assert.equal(
+        processor.processSync("'em . . . 'bout 'cause").toString(),
+        '’em … ’bout ’cause'
+      )
+      assert.equal(
+        retext()
+          .use(retextSmartypants, {dashes: 'inverted'})
+          .processSync("'em —- 'bout 'cause")
+          .toString(),
+        '’em – ’bout ’cause'
+      )
+    }
+  )
+
+  await t.test(
+    'should search again when transforming a tree again',
+    async function () {
+      const tree = retext().parse("'em text?")
+      const transform = retextSmartypants()
+      transform(tree)
+
+      const paragraph = tree.children[0]
+      assert.equal(paragraph.type, 'ParagraphNode')
+      const sentence = paragraph.children[0]
+      assert.equal(sentence.type, 'SentenceNode')
+      sentence.children[0] = {type: 'PunctuationNode', value: "'"}
+      sentence.children[sentence.children.length - 1] = {
+        type: 'PunctuationNode',
+        value: "'"
+      }
+
+      transform(tree)
+      assert.equal(processor.stringify(tree), '‘em text’')
+    }
+  )
+
+  await t.test(
     'should curl apostrophes when followed by a decade (`80s`)',
     async function () {
       assert.equal(

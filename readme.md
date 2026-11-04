@@ -79,6 +79,12 @@ Yields:
 He said, “A ‘simple’ english sentence…”
 ```
 
+The plugin also recognizes some contractions with an omitted beginning, such as
+`'cause`, `'em`, `'round`, `'tis`, and `'twas`, and can turn their leading
+apostrophe into a closing single quote.
+Distinguishing these contractions from quoted text is not always possible.
+For ambiguous cases, write the desired apostrophe directly, such as `’cause`.
+
 ## API
 
 This package exports no identifiers.
