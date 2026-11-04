@@ -259,14 +259,144 @@ test('Curly quotes', async function (t) {
   await t.test(
     'should use correct quotes around work breaks #2',
     async function () {
-      assert.equal(processor.processSync('"~*').toString(), '”~*')
+      assert.equal(processor.processSync('"~*').toString(), '“~*')
     }
   )
 
   await t.test(
     'should use correct quotes around work breaks #3',
     async function () {
-      assert.equal(processor.processSync('"~').toString(), '”~')
+      assert.equal(processor.processSync('"~').toString(), '“~')
+    }
+  )
+
+  await t.test(
+    'should curl quotes followed by punctuation at the end of a word',
+    async function () {
+      assert.equal(
+        processor.processSync("'한국어(테스트)'입니다.").toString(),
+        '‘한국어(테스트)’입니다.'
+      )
+    }
+  )
+
+  await t.test(
+    'should curl quotes followed by punctuation at the end of a word #1',
+    async function () {
+      assert.equal(
+        processor.processSync("'누구인가?'라고 말했다.").toString(),
+        '‘누구인가?’라고 말했다.'
+      )
+    }
+  )
+
+  await t.test(
+    'should curl quotes followed by punctuation at the end of a word #2',
+    async function () {
+      assert.equal(
+        processor.processSync("'맛있다~'라며 감탄했다.").toString(),
+        '‘맛있다~’라며 감탄했다.'
+      )
+    }
+  )
+
+  await t.test(
+    'should open a quote before punctuation and text',
+    async function () {
+      assert.equal(
+        processor.processSync('"...? 뭐라고?"').toString(),
+        '“…? 뭐라고?”'
+      )
+    }
+  )
+
+  await t.test('should open a quote around punctuation', async function () {
+    assert.equal(processor.processSync('"?!"').toString(), '“?!”')
+  })
+
+  await t.test('should open a quote before a dash', async function () {
+    assert.equal(processor.processSync('"—아니—"').toString(), '“—아니—”')
+  })
+
+  await t.test(
+    'should close a quote after multiple punctuation marks',
+    async function () {
+      assert.equal(
+        processor.processSync("'정말?!'이라고 말했다.").toString(),
+        '‘정말?!’이라고 말했다.'
+      )
+      assert.equal(
+        processor.processSync("'한국어((테스트))'입니다.").toString(),
+        '‘한국어((테스트))’입니다.'
+      )
+    }
+  )
+
+  await t.test('should open nested quotes before CJK text', async function () {
+    assert.equal(processor.processSync('"\'한국어\'"').toString(), '“‘한국어’”')
+  })
+
+  await t.test(
+    'should handle nested quotes around a text node',
+    async function () {
+      /** @type {import('nlcst').Root} */
+      const tree = {
+        type: 'RootNode',
+        children: [
+          {
+            type: 'ParagraphNode',
+            children: [
+              {
+                type: 'SentenceNode',
+                children: [
+                  {type: 'PunctuationNode', value: '"'},
+                  {type: 'PunctuationNode', value: "'"},
+                  // Some parsers emit text directly in a sentence.
+                  // @ts-expect-error: Test nonstandard input from such parsers.
+                  {type: 'TextNode', value: '한국어'},
+                  {type: 'PunctuationNode', value: "'"},
+                  {type: 'PunctuationNode', value: '"'}
+                ]
+              }
+            ]
+          }
+        ]
+      }
+
+      retextSmartypants()(tree)
+      assert.equal(processor.stringify(tree), '“‘한국어’”')
+    }
+  )
+
+  await t.test(
+    'should close a quote after a punctuation node with multiple characters',
+    async function () {
+      /** @type {import('nlcst').Root} */
+      const tree = {
+        type: 'RootNode',
+        children: [
+          {
+            type: 'ParagraphNode',
+            children: [
+              {
+                type: 'SentenceNode',
+                children: [
+                  {type: 'PunctuationNode', value: "'"},
+                  // @ts-expect-error: Test text emitted directly in a sentence.
+                  {type: 'TextNode', value: '정말'},
+                  {type: 'PunctuationNode', value: '?!'},
+                  {type: 'PunctuationNode', value: "'"},
+                  // @ts-expect-error: Test text emitted directly in a sentence.
+                  {type: 'TextNode', value: '이라고'}
+                ]
+              }
+            ]
+          }
+        ]
+      }
+
+      retextSmartypants()(tree)
+      assert.equal(processor.stringify(tree), '‘정말?!’이라고')
     }
   )
 })

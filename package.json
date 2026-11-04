@@ -76,6 +76,9 @@
   "type": "module",
   "version": "6.2.0",
   "xo": {
+    "ignores": [
+      "**/*.d.ts"
+    ],
     "prettier": true
   }
 }
