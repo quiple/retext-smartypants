@@ -486,6 +486,21 @@ test('Curly quotes', async function (t) {
     }
   )
 
+  await t.test('should close quotes before a parenthetical', async function () {
+    assert.equal(
+      processor.processSync("'은하(銀河)'(Galaxy)").toString(),
+      '‘은하(銀河)’(Galaxy)'
+    )
+    assert.equal(
+      processor.processSync("'hello!'(aside)").toString(),
+      '‘hello!’(aside)'
+    )
+    assert.equal(
+      processor.processSync("'[word]'(aside)").toString(),
+      '‘[word]’(aside)'
+    )
+  })
+
   await t.test('should open nested quotes before CJK text', async function () {
     assert.equal(processor.processSync('"\'한국어\'"').toString(), '“‘한국어’”')
   })
